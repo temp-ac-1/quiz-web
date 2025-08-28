@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    // ... other settings
+    "jsx": "react-jsx", // or "preserve" or "react" depending on your setup
+    "module": "ESNext",
+    "moduleResolution": "Bundler", // optional, for Vite
+    "target": "ESNext"
+  },
+  "include": ["src", "@/components/ui/button.tsx"],
+  "exclude": ["node_modules"]
+}
