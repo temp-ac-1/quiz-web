@@ -1,0 +1,9 @@
+# .gitignore
+
+# Ignore node_modules in both backend and frontend
+backend/node_modules/
+frontend/node_modules/
+
+# Optional: Other common files you might want to ignore
+.env
+.DS_Store
