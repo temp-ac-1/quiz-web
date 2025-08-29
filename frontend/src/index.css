@@ -118,3 +118,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme inline {
+  /* === Cyber Colors === */
+  --color-cyber-blue: #1A73E8;
+  --color-cyber-green: #34A853;
+  --color-cyber-yellow: #FBBC05;
+  --color-cyber-red: #EA4335;
+  --color-cyber-purple: #9C27B0;
+
+  /* === Fonts === */
+  --font-cyber: "Share Tech Mono", monospace;
+
+  /* === Shadows === */
+  --shadow-cyber: 0 0 15px rgba(26, 115, 232, 0.6);
+}

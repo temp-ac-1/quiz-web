@@ -14,8 +14,24 @@ const transporter = nodemailer.createTransport({
 
 // Generate JWT
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign(
+    { id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+      issuer: "cybersec-website",
+      audience: "cybersec-users"
+    }
+  );
 };
+
+//jwt verify
+// jwt.verify(token, process.env.JWT_SECRET, {
+//   issuer: "cybersec-website",
+//   audience: "cybersec-users"
+// });
+
+
 
 // 📌 Register User
 export const registerUser = async (req, res) => {
@@ -23,7 +39,22 @@ export const registerUser = async (req, res) => {
     const { email, password } = req.body;
 
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: "User already exists" });
+    if (userExists)
+      return res.status(400).json({ message: "User already exists" });
+
+    // Password Strength Validation
+    const isStrongPassword = (password) => {
+      const strongRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return strongRegex.test(password);
+    };
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 chars long, include uppercase, lowercase, number, and special character.",
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -45,9 +76,12 @@ export const registerUser = async (req, res) => {
       text: `Your OTP is ${otp}. It expires in 15 minutes.`,
     });
 
-    res.status(201).json({ message: "User registered. Please verify your email with OTP." });
+    res
+      .status(201)
+      .json({ message: "User registered. Please verify your email with OTP." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    error.statusCode = 500;
+    next(error);
   }
 };
 
@@ -70,7 +104,8 @@ export const verifyOtp = async (req, res) => {
 
     res.json({ message: "Email verified successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    error.statusCode = 500;
+    next(error);
   }
 };
 
@@ -80,18 +115,23 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Invalid email or password" });
+    if (!user)
+      return res.status(404).json({ message: "Invalid email or password" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid email or password" });
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: "Invalid email or password" });
 
     if (!user.isVerified) {
-      return res.status(401).json({ message: "Please verify your email before login" });
+      return res
+        .status(401)
+        .json({ message: "Please verify your email before login" });
     }
 
     const token = generateToken(user._id);
     res.json({ token, message: "Login successful" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    error.statusCode = 500;
+    next(error);
   }
 };
