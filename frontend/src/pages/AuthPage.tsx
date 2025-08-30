@@ -7,12 +7,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Github, Mail, Lock, Shield, ArrowRight, User, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
-import { Button } from '../../@/components/ui/button';
-import { Input } from '../../@/components/ui/input';
-import { Label } from '../../@/components/ui/label';
-import { Checkbox } from '../../@/components/ui/checkbox';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../@/components/ui/card';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../../@/components/ui/input-otp';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Checkbox } from '../components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../components/ui/input-otp';
 import { toast } from 'sonner';
 import { 
   validateEmail, 
