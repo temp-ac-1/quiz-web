@@ -1,11 +1,24 @@
 {
   "compilerOptions": {
-    // ... other settings
-    "jsx": "react-jsx", // or "preserve" or "react" depending on your setup
+    "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler", // optional, for Vite
-    "target": "ESNext"
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node", "vite/client"],
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"]
+    }
   },
-  "include": ["src", "@/components/ui/button.tsx"],
+  "include": [
+    "src",
+    "src/**/*", // Include all files in src
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }

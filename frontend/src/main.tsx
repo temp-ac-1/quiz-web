@@ -1,12 +1,19 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App'
-import { Toaster } from 'sonner'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { Toaster } from "sonner";
 
-createRoot(document.getElementById('root')!).render(
+// ✅ import Provider and store
+import { Provider } from "react-redux";
+import { store } from "./store";
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
-    <Toaster/>
-  </StrictMode>,
-)
+    {/* ✅ Wrap App with Provider */}
+    <Provider store={store}>
+      <App />
+      <Toaster />
+    </Provider>
+  </StrictMode>
+);
