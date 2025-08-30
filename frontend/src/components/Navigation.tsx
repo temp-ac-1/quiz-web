@@ -23,9 +23,9 @@ const Navigation = () => {
             <Link to="/profile" className="text-blue-600 font-medium">
               Profile
             </Link>
-            <Link to="/leaderboard" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center">
+            <Link to="/Blog" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center">
               <BarChart3 className="h-4 w-4 mr-1" />
-              Leaderboard
+              Blog
             </Link>
           </div>
         </div>

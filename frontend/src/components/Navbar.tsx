@@ -19,7 +19,7 @@ const Navbar = () => {
   const navigation = [
     { name: 'Home', href: '/', current: location.pathname === '/' },
     { name: 'Categories', href: '/categories', current: location.pathname === '/categories' },
-    { name: 'Leaderboard', href: '/leaderboard', current: location.pathname === '/leaderboard' },
+    { name: 'Blog', href: '/Blog', current: location.pathname === '/Blog' },
     { name: 'Resources', href: '/resources', current: location.pathname === '/resources' },
     { name: 'About', href: '/about', current: location.pathname === '/about' },
   ];
@@ -89,7 +89,7 @@ const Navbar = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 to-purple-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
                   <User className="w-4 h-4 mr-2 relative z-10" />
-                  <span className="relative z-10">ACCESS</span>
+                  <span className="relative z-10">PROFILE</span>
                 </button>
               </Link>
             </div>
@@ -137,7 +137,7 @@ const Navbar = () => {
                   className="flex items-center px-3 py-3 text-base font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-400/10 rounded-md mt-2 border-t border-cyan-400/20 pt-4"
                 >
                   <User className="w-5 h-5 mr-3" />
-                  ACCESS PORTAL
+                  PROFILE
                 </Link>
               </div>
             </div>

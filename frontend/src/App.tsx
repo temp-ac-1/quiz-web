@@ -24,7 +24,7 @@ function App() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
           <Route path="/profile" element={<div className="min-h-screen flex items-center justify-center"><h1>Profile Page - Coming Soon</h1></div>} />
-          <Route path="/leaderboard" element={<div className="min-h-screen flex items-center justify-center"><h1>Leaderboard Page - Coming Soon</h1></div>} />
+          <Route path="/Blog" element={<div className="min-h-screen flex items-center justify-center"><h1>Blog Page - Coming Soon</h1></div>} />
           <Route path="/resources" element={<div className="min-h-screen flex items-center justify-center"><h1>Resources Page - Coming Soon</h1></div>} />
           <Route path="/about" element={<div className="min-h-screen flex items-center justify-center"><h1>About Page - Coming Soon</h1></div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

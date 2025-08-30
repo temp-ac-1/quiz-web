@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
   const [howItWorksRef, howItWorksInView] = useInView({ threshold: 0.2, triggerOnce: true });
   const [categoriesRef, categoriesInView] = useInView({ threshold: 0.2, triggerOnce: true });
   const [benefitsRef, benefitsInView] = useInView({ threshold: 0.2, triggerOnce: true });
-  const [leaderboardRef, leaderboardInView] = useInView({ threshold: 0.2, triggerOnce: true });
+  const [BlogRef, BlogInView] = useInView({ threshold: 0.2, triggerOnce: true });
   const [resourcesRef, resourcesInView] = useInView({ threshold: 0.2, triggerOnce: true });
 
   // Hero section animation
@@ -95,7 +95,7 @@ const HomePage: React.FC = () => {
     },
     {
       icon: Trophy,
-      title: 'Climb the Leaderboard & Compete',
+      title: 'Climb the Blog & Compete',
       description: 'Compete with professionals and track your progress'
     }
   ];
@@ -155,12 +155,12 @@ const HomePage: React.FC = () => {
     {
       number: '03',
       title: 'Track Progress & Compete',
-      description: 'Learn from mistakes, track your improvement, and climb the global leaderboard'
+      description: 'Learn from mistakes, track your improvement, and climb the global Blog'
     }
   ];
 
-  // Mock leaderboard data
-  const leaderboardData = [
+  // Mock Blog data
+  const BlogData = [
     { name: 'Alex Chen', score: 2840, rank: 1 },
     { name: 'Sarah Johnson', score: 2735, rank: 2 },
     { name: 'Mike Rodriguez', score: 2690, rank: 3 },
@@ -398,8 +398,8 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Leaderboard Preview */}
-        <section ref={leaderboardRef} className="py-20 px-4 sm:px-6 lg:px-8 w-full">
+        {/* Blog Preview */}
+        <section ref={BlogRef} className="py-20 px-4 sm:px-6 lg:px-8 w-full">
           <div className="w-full max-w-4xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{fontFamily: "'Orbitron', sans-serif"}}>Top Performers This Week</h2>
@@ -412,12 +412,12 @@ const HomePage: React.FC = () => {
               <CardHeader>
                 <CardTitle className="text-center flex items-center justify-center text-cyan-300">
                   <Trophy className="w-6 h-6 text-cyan-400 mr-2" />
-                  Leaderboard
+                  Blog
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {leaderboardData.map((player, index) => (
+                  {BlogData.map((player, index) => (
                     <div 
                       key={index} 
                       className="flex items-center justify-between p-4 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
@@ -441,9 +441,9 @@ const HomePage: React.FC = () => {
                 </div>
                 
                 <div className="text-center mt-6">
-                  <Link to="/leaderboard">
+                  <Link to="/Blog">
                     <Button variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-200 hover:text-white">
-                      View Full Leaderboard
+                      View Full Blog
                     </Button>
                   </Link>
                 </div>

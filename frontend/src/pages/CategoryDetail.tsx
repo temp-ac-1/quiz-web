@@ -582,10 +582,10 @@ const CategoryDetail: React.FC = () => {
                     <Zap className="w-4 h-4 mr-2" />
                     Take Custom Quiz
                   </Button>
-                  <Link to="/leaderboard" className="block">
+                  <Link to="/Blog" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <Trophy className="w-4 h-4 mr-2" />
-                      View Leaderboard
+                      View Blog
                     </Button>
                   </Link>
                   <Link to="/resources" className="block">
