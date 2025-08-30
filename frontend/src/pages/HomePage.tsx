@@ -263,7 +263,7 @@ const HomePage: React.FC = () => {
               </Link>
               
               <a href="#categories">
-                <Button variant="outline" size="lg" className="border-cyan-400/30 hover:border-cyan-400 text-lg px-8 py-4 text-gray-200 hover:text-white">
+                <Button variant="outline" size="lg" className="border-cyan-400/30 hover:border-cyan-400 text-lg px-8 py-4 text-gray-500 hover:text-black">
                   Explore Categories
                 </Button>
               </a>
@@ -346,7 +346,7 @@ const HomePage: React.FC = () => {
 
             <div className="text-center">
               <Link to="/categories">
-                <Button variant="outline" size="lg" className="border-cyan-400/30 hover:border-cyan-400 text-gray-200 hover:text-white">
+                <Button variant="outline" size="lg" className="border-cyan-400/30 hover:border-cyan-400 text-gray-500 hover:text-black">
                   View All Categories
                 </Button>
               </Link>
@@ -442,7 +442,7 @@ const HomePage: React.FC = () => {
                 
                 <div className="text-center mt-6">
                   <Link to="/Blog">
-                    <Button variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-200 hover:text-white">
+                    <Button variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-500 hover:text-black">
                       View Full Blog
                     </Button>
                   </Link>
@@ -482,7 +482,7 @@ const HomePage: React.FC = () => {
                         <Clock className="w-4 h-4 mr-1" />
                         {resource.readTime}
                       </div>
-                      <Button size="sm" variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-200 hover:text-white">
+                      <Button size="sm" variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-500 hover:text-black">
                         Read More
                       </Button>
                     </div>
@@ -493,7 +493,7 @@ const HomePage: React.FC = () => {
 
             <div className="text-center">
               <Link to="/resources">
-                <Button size="lg" variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-200 hover:text-white">
+                <Button size="lg" variant="outline" className="border-cyan-400/30 hover:border-cyan-400 text-gray-500 hover:text-black">
                   Explore More Resources
                 </Button>
               </Link>
