@@ -260,7 +260,7 @@ const HomePage: React.FC = () => {
                 </Button>
               </Link>
               <a href="#categories">
-                <Button variant="outline" size="lg" className="border-black hover:border-gray-900 text-lg px-8 py-4 text-black hover:text-white">
+                <Button variant="outline" size="lg" className="border-black bg-white text-black font-bold text-lg px-8 py-4 hover:bg-black hover:text-white hover:border-black transition-all duration-200">
                   Explore Categories
                 </Button>
               </a>

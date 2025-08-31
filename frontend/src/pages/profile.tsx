@@ -137,11 +137,11 @@ const Profile = () => {
   return (
     <div className="min-h-screen w-full bg-white text-black p-0" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Navbar />
-  <div className="mt-16 mx-6 md:mx-20 lg:mx-48">
+  <div className="mt-20 mx-6 md:mx-20 lg:mx-48">
         {/* Profile Header */}
         <Card className="bg-white border border-black rounded-xl mt-0 mb-4 font-sans" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
           <CardHeader>
-            <div className="flex flex-col md:flex-row md:items-start justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-center space-x-4 mb-4 md:mb-0">
                 <Avatar className="h-16 w-16 md:h-20 md:w-20 border-2 border-black">
                   <AvatarFallback className="bg-gray-100 text-black text-xl md:text-2xl font-bold">
@@ -157,10 +157,12 @@ const Profile = () => {
                   </Badge>
                 </div>
               </div>
-              <Button className="border border-black text-black bg-white w-full md:w-auto justify-center font-bold py-2 px-4 transition-all duration-200 hover:bg-black hover:text-white">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
+              <div className="flex items-center md:justify-end w-full md:w-auto">
+                  <Button className="border border-black bg-black text-white font-bold py-2 px-6 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-900 hover:text-white flex items-center gap-2">
+                    <Edit className="h-5 w-5 text-white" />
+                    Edit Profile
+                  </Button>
+              </div>
             </div>
           </CardHeader>
           
