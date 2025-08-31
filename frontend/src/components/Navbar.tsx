@@ -34,7 +34,7 @@ const Navbar = () => {
             : "bg-gray-900/80 backdrop-blur-lg border-b border-cyan-400/20"
           }
         `}
-        style={{fontFamily: "'Orbitron', sans-serif"}}
+  style={{fontFamily: "'Inter', system-ui, sans-serif"}}
       >
         {/* Animated circuit line */}
         <div className="h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_rgba(0,255,255,0.7)] animate-pulse"></div>
@@ -147,7 +147,7 @@ const Navbar = () => {
 
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap');
+          /* Removed Orbitron font import, using Inter globally */
           
           :root {
             --neon-cyan: #00f3ff;
@@ -159,7 +159,7 @@ const Navbar = () => {
           body {
             background-color: var(--dark-bg);
             color: #e0e0e0;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;

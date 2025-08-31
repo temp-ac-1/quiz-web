@@ -115,7 +115,20 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background;
+    color: var(--color-foreground);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: var(--color-foreground);
+  }
+  a, button, .hoverable {
+    transition: color 0.2s, background 0.2s;
+  }
+  a:hover, button:hover, .hoverable:hover {
+    color: var(--color-primary-foreground);
+    background: var(--color-primary);
   }
 }
 

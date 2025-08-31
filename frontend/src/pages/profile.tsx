@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, User, Trophy, Target, Calendar, Edit, Settings, Award, Zap, Shield } from "lucide-react";
+import Navbar from '../components/Navbar';
 
 // UI Components
 const Button = ({ variant = "default", className = "", children, ...props }) => {
@@ -134,36 +135,29 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
-        <Link 
-          to="/"
-          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-all duration-300 mb-6 md:mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Home</span>
-        </Link>
-
+    <div className="min-h-screen w-full bg-white text-black p-0" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <Navbar />
+  <div className="mt-16 mx-6 md:mx-20 lg:mx-48">
         {/* Profile Header */}
-        <Card className="bg-white border border-gray-200 shadow-md rounded-xl mb-6 md:mb-8 transition-all duration-300 hover:shadow-lg">
+        <Card className="bg-white border border-black rounded-xl mt-0 mb-4 font-sans" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-start justify-between">
               <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                <Avatar className="h-16 w-16 md:h-20 md:w-20 border-2 border-blue-600">
-                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xl md:text-2xl font-bold">
+                <Avatar className="h-16 w-16 md:h-20 md:w-20 border-2 border-black">
+                  <AvatarFallback className="bg-gray-100 text-black text-xl md:text-2xl font-bold">
                     {user.username.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{user.username}</h1>
-                  <p className="text-gray-600 text-sm md:text-base">{user.email}</p>
-                  <p className="text-xs md:text-sm text-gray-500">Member since {user.joinDate}</p>
-                  <Badge className="mt-2 bg-blue-100 text-blue-700 border-blue-300">
+                  <h1 className="text-2xl md:text-3xl font-bold text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 900 }}>{user.username}</h1>
+                    <p className="text-black text-sm md:text-base" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{user.email}</p>
+                    <p className="text-xs md:text-sm text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Member since {user.joinDate}</p>
+                  <Badge className="mt-2 bg-gray-100 text-black border-black">
                     {user.level}
                   </Badge>
                 </div>
               </div>
-              <Button className="bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 w-full md:w-auto justify-center">
+              <Button className="border border-black text-black bg-white w-full md:w-auto justify-center font-bold py-2 px-4 transition-all duration-200 hover:bg-black hover:text-white">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
@@ -171,22 +165,22 @@ const Profile = () => {
           </CardHeader>
           
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <div className="text-center p-3 rounded-lg bg-gray-50 transition-all duration-300 hover:bg-gray-100">
-                <div className="text-xl md:text-2xl font-bold text-blue-600">{user.totalScore.toLocaleString()}</div>
-                <div className="text-xs md:text-sm text-gray-600">Total Score</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center p-4 rounded-lg bg-white border border-black">
+                <div className="text-xl md:text-2xl font-bold text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{user.totalScore.toLocaleString()}</div>
+                  <div className="text-xs md:text-sm text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Total Score</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-gray-50 transition-all duration-300 hover:bg-gray-100">
-                <div className="text-xl md:text-2xl font-bold text-purple-600">{user.quizzesCompleted}</div>
-                <div className="text-xs md:text-sm text-gray-600">Quizzes Completed</div>
+              <div className="text-center p-4 rounded-lg bg-white border border-black">
+                <div className="text-xl md:text-2xl font-bold text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{user.quizzesCompleted}</div>
+                  <div className="text-xs md:text-sm text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Quizzes Completed</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-gray-50 transition-all duration-300 hover:bg-gray-100">
-                <div className="text-xl md:text-2xl font-bold text-green-600">{user.averageScore}%</div>
-                <div className="text-xs md:text-sm text-gray-600">Average Score</div>
+              <div className="text-center p-4 rounded-lg bg-white border border-black">
+                <div className="text-xl md:text-2xl font-bold text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{user.averageScore}%</div>
+                  <div className="text-xs md:text-sm text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Average Score</div>
               </div>
-              <div className="text-center p-3 rounded-lg bg-gray-50 transition-all duration-300 hover:bg-gray-100">
-                <div className="text-xl md:text-2xl font-bold text-red-600">{user.rank}</div>
-                <div className="text-xs md:text-sm text-gray-600">Global Rank</div>
+              <div className="text-center p-4 rounded-lg bg-white border border-black">
+                <div className="text-xl md:text-2xl font-bold text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{user.rank}</div>
+                  <div className="text-xs md:text-sm text-black" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Global Rank</div>
               </div>
             </div>
           </CardContent>
@@ -204,10 +198,10 @@ const Profile = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 whitespace-nowrap ${
+                className={`px-4 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap ${
                   activeTab === tab.id 
-                    ? "bg-white text-blue-600 shadow-sm" 
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-black shadow-sm" 
+                    : "text-black hover:text-gray-700"
                 }`}
               >
                 {tab.label}
