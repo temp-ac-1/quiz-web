@@ -8,6 +8,8 @@ import NotFound from './pages/NotFound';
 import CategoryDetail from './pages/CategoryDetail';
 import Categories from './pages/Categories';
 import Quiz from './pages/Quiz';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 
 function App() {
 
@@ -20,10 +22,12 @@ function App() {
           <Route path="/category/:slug" element={<CategoryDetail />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/quiz/:slug" element={<Quiz />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
-          <Route path="/profile" element={<div className="min-h-screen flex items-center justify-center"><h1>Profile Page - Coming Soon</h1></div>} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/Blog" element={<div className="min-h-screen flex items-center justify-center"><h1>Blog Page - Coming Soon</h1></div>} />
           <Route path="/resources" element={<div className="min-h-screen flex items-center justify-center"><h1>Resources Page - Coming Soon</h1></div>} />
           <Route path="/about" element={<div className="min-h-screen flex items-center justify-center"><h1>About Page - Coming Soon</h1></div>} />
