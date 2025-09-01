@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, PenTool, Star, TrendingUp, Clock, User, Eye, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, PenTool, Star, TrendingUp, Clock, User, Eye, ArrowRight, Filter, Grid3X3, List, BookOpen, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-// Dummy data for blog articles
+// Extended dummy data for blog articles
 const blogArticles = [
   {
     id: 1,
     title: "Advanced Network Security: Zero Trust Architecture",
     slug: "zero-trust-architecture-guide",
-    excerpt: "Learn how to implement Zero Trust security model in modern enterprise environments...",
+    excerpt: "Learn how to implement Zero Trust security model in modern enterprise environments with practical examples and real-world scenarios.",
     author: { name: "Sarah Chen", avatar: "/api/placeholder/40/40" },
     category: "Network Security",
     skillLevel: "Advanced",
@@ -28,7 +29,7 @@ const blogArticles = [
     id: 2,
     title: "Malware Analysis with Wireshark: A Beginner's Guide",
     slug: "malware-analysis-wireshark-guide",
-    excerpt: "Step-by-step tutorial on analyzing network traffic to detect malicious activities...",
+    excerpt: "Step-by-step tutorial on analyzing network traffic to detect malicious activities using Wireshark's powerful features.",
     author: { name: "Mike Rodriguez", avatar: "/api/placeholder/40/40" },
     category: "Malware Analysis",
     skillLevel: "Beginner",
@@ -42,7 +43,7 @@ const blogArticles = [
     id: 3,
     title: "Cryptography Fundamentals: RSA vs ECC",
     slug: "cryptography-rsa-vs-ecc",
-    excerpt: "Deep dive into the mathematical foundations and practical applications of RSA and ECC...",
+    excerpt: "Deep dive into the mathematical foundations and practical applications of RSA and ECC encryption algorithms.",
     author: { name: "Dr. Emily Watson", avatar: "/api/placeholder/40/40" },
     category: "Cryptography",
     skillLevel: "Intermediate",
@@ -55,7 +56,7 @@ const blogArticles = [
     id: 4,
     title: "Secure Coding Practices for Node.js Applications",
     slug: "secure-coding-nodejs",
-    excerpt: "Essential security patterns and common vulnerabilities to avoid in Node.js development...",
+    excerpt: "Essential security patterns and common vulnerabilities to avoid in Node.js development with code examples.",
     author: { name: "Alex Thompson", avatar: "/api/placeholder/40/40" },
     category: "Secure Coding",
     skillLevel: "Intermediate",
@@ -68,7 +69,7 @@ const blogArticles = [
     id: 5,
     title: "Linux Threat Hunting: Advanced Techniques",
     slug: "linux-threat-hunting-techniques",
-    excerpt: "Master advanced threat hunting methodologies using Linux command line tools...",
+    excerpt: "Master advanced threat hunting methodologies using Linux command line tools and forensic techniques.",
     author: { name: "Jordan Kim", avatar: "/api/placeholder/40/40" },
     category: "Threat Hunting",
     skillLevel: "Advanced",
@@ -82,7 +83,7 @@ const blogArticles = [
     id: 6,
     title: "Introduction to Penetration Testing",
     slug: "penetration-testing-introduction",
-    excerpt: "Your first steps into ethical hacking and penetration testing methodologies...",
+    excerpt: "Your first steps into ethical hacking and penetration testing methodologies with practical exercises.",
     author: { name: "Lisa Chang", avatar: "/api/placeholder/40/40" },
     category: "Penetration Testing",
     skillLevel: "Beginner",
@@ -90,12 +91,134 @@ const blogArticles = [
     tags: ["Pentesting", "Ethical Hacking", "Methodology"],
     views: 4231,
     publishedAt: "2024-01-10"
+  },
+  {
+    id: 7,
+    title: "Cloud Security Best Practices for AWS",
+    slug: "cloud-security-aws-practices",
+    excerpt: "Comprehensive guide to securing AWS infrastructure with IAM policies, VPC configurations, and monitoring.",
+    author: { name: "David Park", avatar: "/api/placeholder/40/40" },
+    category: "Cloud Security",
+    skillLevel: "Intermediate",
+    readTime: "14 min",
+    tags: ["AWS", "Cloud", "IAM", "Monitoring"],
+    trending: true,
+    views: 3145,
+    publishedAt: "2024-01-09"
+  },
+  {
+    id: 8,
+    title: "SIEM Implementation and Management",
+    slug: "siem-implementation-guide",
+    excerpt: "Learn how to implement and manage Security Information and Event Management systems effectively.",
+    author: { name: "Rachel Martinez", avatar: "/api/placeholder/40/40" },
+    category: "SIEM",
+    skillLevel: "Advanced",
+    readTime: "20 min",
+    tags: ["SIEM", "Log Analysis", "Incident Response"],
+    views: 2987,
+    publishedAt: "2024-01-08"
+  },
+  {
+    id: 9,
+    title: "Mobile Application Security Testing",
+    slug: "mobile-app-security-testing",
+    excerpt: "Complete guide to testing mobile applications for security vulnerabilities on Android and iOS platforms.",
+    author: { name: "Kevin Wu", avatar: "/api/placeholder/40/40" },
+    category: "Mobile Security",
+    skillLevel: "Intermediate",
+    readTime: "16 min",
+    tags: ["Mobile", "Android", "iOS", "Testing"],
+    featured: true,
+    views: 2234,
+    publishedAt: "2024-01-07"
+  },
+  {
+    id: 10,
+    title: "Incident Response Playbook Development",
+    slug: "incident-response-playbook",
+    excerpt: "Step-by-step guide to creating effective incident response playbooks for your organization.",
+    author: { name: "Maria Silva", avatar: "/api/placeholder/40/40" },
+    category: "Incident Response",
+    skillLevel: "Advanced",
+    readTime: "22 min",
+    tags: ["IR", "Playbook", "Process", "Management"],
+    views: 1876,
+    publishedAt: "2024-01-06"
+  },
+  {
+    id: 11,
+    title: "API Security Testing with OWASP Tools",
+    slug: "api-security-owasp-testing",
+    excerpt: "Comprehensive guide to testing API security using OWASP tools and methodologies.",
+    author: { name: "James Liu", avatar: "/api/placeholder/40/40" },
+    category: "API Security",
+    skillLevel: "Intermediate",
+    readTime: "13 min",
+    tags: ["API", "OWASP", "Testing", "REST"],
+    trending: true,
+    views: 2654,
+    publishedAt: "2024-01-05"
+  },
+  {
+    id: 12,
+    title: "Blockchain Security Fundamentals",
+    slug: "blockchain-security-fundamentals",
+    excerpt: "Understanding security challenges and solutions in blockchain technology and smart contracts.",
+    author: { name: "Sophie Anderson", avatar: "/api/placeholder/40/40" },
+    category: "Blockchain Security",
+    skillLevel: "Beginner",
+    readTime: "11 min",
+    tags: ["Blockchain", "Smart Contracts", "DeFi"],
+    views: 1987,
+    publishedAt: "2024-01-04"
+  },
+  {
+    id: 13,
+    title: "Red Team Operations: Advanced Tactics",
+    slug: "red-team-operations-tactics",
+    excerpt: "Advanced red team tactics and techniques for realistic security assessments and penetration testing.",
+    author: { name: "Michael Brown", avatar: "/api/placeholder/40/40" },
+    category: "Red Team",
+    skillLevel: "Advanced",
+    readTime: "25 min",
+    tags: ["Red Team", "TTPs", "Advanced Persistent Threat"],
+    featured: true,
+    views: 3456,
+    publishedAt: "2024-01-03"
+  },
+  {
+    id: 14,
+    title: "Container Security with Docker and Kubernetes",
+    slug: "container-security-docker-kubernetes",
+    excerpt: "Best practices for securing containerized applications using Docker and Kubernetes security features.",
+    author: { name: "Amanda Taylor", avatar: "/api/placeholder/40/40" },
+    category: "Container Security",
+    skillLevel: "Intermediate",
+    readTime: "17 min",
+    tags: ["Docker", "Kubernetes", "Containers", "DevSecOps"],
+    views: 2743,
+    publishedAt: "2024-01-02"
+  },
+  {
+    id: 15,
+    title: "Social Engineering Attack Prevention",
+    slug: "social-engineering-prevention",
+    excerpt: "Strategies and techniques to identify and prevent social engineering attacks in your organization.",
+    author: { name: "Robert Johnson", avatar: "/api/placeholder/40/40" },
+    category: "Social Engineering",
+    skillLevel: "Beginner",
+    readTime: "9 min",
+    tags: ["Social Engineering", "Awareness", "Training"],
+    trending: true,
+    views: 4567,
+    publishedAt: "2024-01-01"
   }
 ];
 
-const categories = ["All", "Network Security", "Malware Analysis", "Cryptography", "Secure Coding", "Threat Hunting", "Penetration Testing"];
+const categories = ["All", "Network Security", "Malware Analysis", "Cryptography", "Secure Coding", "Threat Hunting", "Penetration Testing", "Cloud Security", "SIEM", "Mobile Security", "Incident Response", "API Security", "Blockchain Security", "Red Team", "Container Security", "Social Engineering"];
 const skillLevels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
-const tags = ["Wireshark", "OWASP", "Linux", "Threat Hunting", "Zero Trust", "RSA", "Node.js", "Pentesting"];
+const tags = ["Wireshark", "OWASP", "Linux", "Threat Hunting", "Zero Trust", "RSA", "Node.js", "Pentesting", "AWS", "Cloud", "SIEM", "Mobile", "API", "Blockchain", "Docker", "Kubernetes"];
 const sortOptions = ["Most Recent", "Trending", "Most Viewed"];
 
 const Blog = () => {
@@ -105,14 +228,19 @@ const Blog = () => {
   const [sortBy, setSortBy] = useState("Most Recent");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const articlesPerPage = 6;
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const articlesPerPage = 9;
 
   const getSkillLevelColor = (level: string) => {
     switch (level) {
-      case "Beginner": return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "Intermediate": return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-      case "Advanced": return "bg-red-500/20 text-red-400 border-red-500/30";
-      default: return "bg-muted text-muted-foreground";
+      case "Beginner": 
+        return "bg-secondary/20 text-secondary border-secondary/30";
+      case "Intermediate": 
+        return "bg-accent/20 text-accent border-accent/30";
+      case "Advanced": 
+        return "bg-destructive/20 text-destructive border-destructive/30";
+      default: 
+        return "bg-muted text-muted-foreground border-muted/30";
     }
   };
 
@@ -156,310 +284,490 @@ const Blog = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-r from-background via-background to-primary/5">
-        <div className="container mx-auto max-w-7xl text-center">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6">
-            Share Knowledge. Learn More. Stay Ahead.
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Explore cybersecurity insights, tutorials, and guides written by the community.
-          </p>
+      {/* Modern Hero Section */}
+      <section className="relative py-24 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)/0.1),transparent_70%)]" />
+        <div className="container mx-auto max-w-7xl text-center relative z-10">
+          <div className="animate-fade-in">
+            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Knowledge Hub
+            </Badge>
+            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+                Cybersecurity
+              </span>
+              <br />
+              <span className="text-foreground">Insights Hub</span>
+            </h1>
+            <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+              Discover cutting-edge cybersecurity articles, tutorials, and insights from industry experts. 
+              Stay ahead of threats and enhance your security knowledge.
+            </p>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Button size="lg" className="bg-gradient-cyber text-white hover:opacity-90">
-              <PenTool className="w-5 h-5 mr-2" />
-              ✍️ Write a Blog
-            </Button>
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+            <Link to="/blog/write">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-glow transition-all duration-300 px-8 py-4">
+                <PenTool className="w-5 h-5 mr-2" />
+                Write Your Article
+              </Button>
+            </Link>
+            <div className="relative w-full max-w-lg">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
-                placeholder="Search articles..."
+                placeholder="Search cybersecurity topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-12 h-14 bg-card/50 border-border/50 focus:border-primary/50 backdrop-blur-sm"
               />
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Filter and Discover Section */}
-      <section className="py-8 px-4 border-b border-border/50">
-        <div className="container mx-auto max-w-7xl">
-          {/* Categories */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Categories</h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className="rounded-full"
-                >
-                  {category}
-                </Button>
-              ))}
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary mb-2">15+</div>
+              <div className="text-muted-foreground">Expert Articles</div>
             </div>
-          </div>
-
-          {/* Skill Levels */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Skill Level</h3>
-            <div className="flex flex-wrap gap-2">
-              {skillLevels.map((level) => (
-                <Button
-                  key={level}
-                  variant={selectedSkillLevel === level ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedSkillLevel(level)}
-                  className="rounded-full"
-                >
-                  {level}
-                </Button>
-              ))}
+            <div className="text-center">
+              <div className="text-3xl font-bold text-secondary mb-2">5K+</div>
+              <div className="text-muted-foreground">Monthly Readers</div>
             </div>
-          </div>
-
-          {/* Tags */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3">Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Button
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleTag(tag)}
-                  className="rounded-full"
-                >
-                  {tag}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sort Options */}
-          <div className="flex justify-between items-center">
-            <div className="text-muted-foreground">
-              Showing {currentArticles.length} of {sortedArticles.length} articles
-            </div>
-            <div className="flex gap-2">
-              {sortOptions.map((option) => (
-                <Button
-                  key={option}
-                  variant={sortBy === option ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setSortBy(option)}
-                >
-                  {option}
-                </Button>
-              ))}
+            <div className="text-center">
+              <div className="text-3xl font-bold text-accent mb-2">12+</div>
+              <div className="text-muted-foreground">Categories</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Articles Section */}
-      {featuredArticles.length > 0 && (
-        <section className="py-12 px-4">
-          <div className="container mx-auto max-w-7xl">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
-              <Star className="w-8 h-8 text-yellow-500" />
-              Featured & Trending
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {featuredArticles.slice(0, 3).map((article) => (
-                <Link key={article.id} to={`/blog/${article.slug}`}>
-                  <Card className="group hover:shadow-glow transition-all duration-300 cursor-pointer border-border/50 hover:border-primary/30 relative overflow-hidden">
-                    {article.featured && (
-                      <div className="absolute top-4 left-4 z-10">
-                        <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                          ⭐ Editor's Pick
-                        </Badge>
-                      </div>
-                    )}
-                    {article.trending && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
-                          🔥 Trending
-                        </Badge>
-                      </div>
-                    )}
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <img src={article.author.avatar} alt={article.author.name} className="w-10 h-10 rounded-full bg-muted" />
-                        <div>
-                          <p className="font-medium">{article.author.name}</p>
-                          <p className="text-sm text-muted-foreground">{article.category}</p>
-                        </div>
-                      </div>
-                      <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                        {article.title}
-                      </h3>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">{article.excerpt}</p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <Badge className={getSkillLevelColor(article.skillLevel)}>
-                          {article.skillLevel}
-                        </Badge>
-                        {article.tags.slice(0, 2).map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center gap-4">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {article.readTime}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Eye className="w-4 h-4" />
-                            {article.views}
-                          </span>
-                        </div>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Blog Articles Grid */}
-      <section className="py-12 px-4">
+      {/* Enhanced Filter Section */}
+      <section className="py-12 px-4 bg-card/30 border-y border-border/50 backdrop-blur-sm">
         <div className="container mx-auto max-w-7xl">
-          <h2 className="text-3xl font-bold mb-8">Latest Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentArticles.map((article) => (
-              <Link key={article.id} to={`/blog/${article.slug}`}>
-                <Card className="group hover:shadow-glow transition-all duration-300 cursor-pointer border-border/50 hover:border-primary/30">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <img src={article.author.avatar} alt={article.author.name} className="w-10 h-10 rounded-full bg-muted" />
-                      <div>
-                        <p className="font-medium">{article.author.name}</p>
-                        <p className="text-sm text-muted-foreground">{article.category}</p>
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                      {article.title}
-                    </h3>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">{article.excerpt}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge className={getSkillLevelColor(article.skillLevel)}>
-                        {article.skillLevel}
-                      </Badge>
-                      {article.tags.slice(0, 2).map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {article.readTime}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {article.views}
-                        </span>
-                      </div>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Previous
-              </Button>
-              
-              <div className="flex gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(page)}
-                    className="w-10 h-10 p-0"
-                  >
-                    {page}
-                  </Button>
-                ))}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Filters */}
+            <div className="lg:w-1/4 space-y-8">
+              <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border border-border/50">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Filter className="w-5 h-5 text-primary" />
+                  Categories
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {categories.slice(0, 8).map((category) => (
+                    <Button
+                      key={category}
+                      variant={selectedCategory === category ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedCategory(category)}
+                      className="rounded-full text-xs"
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-                <ChevronRight className="w-4 h-4" />
-              </Button>
+              <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border border-border/50">
+                <h3 className="text-lg font-semibold mb-4">Skill Level</h3>
+                <div className="flex flex-wrap gap-2">
+                  {skillLevels.map((level) => (
+                    <Button
+                      key={level}
+                      variant={selectedSkillLevel === level ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedSkillLevel(level)}
+                      className="rounded-full text-xs"
+                    >
+                      {level}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-card/50 backdrop-blur-sm p-6 rounded-xl border border-border/50">
+                <h3 className="text-lg font-semibold mb-4">Popular Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tags.slice(0, 10).map((tag) => (
+                    <Button
+                      key={tag}
+                      variant={selectedTags.includes(tag) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleTag(tag)}
+                      className="rounded-full text-xs"
+                    >
+                      {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Right Content */}
+            <div className="lg:w-3/4">
+              {/* Control Bar */}
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div className="text-muted-foreground">
+                  <span className="text-lg font-medium text-foreground">{sortedArticles.length}</span> articles found
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-2">
+                    {sortOptions.map((option) => (
+                      <Button
+                        key={option}
+                        variant={sortBy === option ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setSortBy(option)}
+                      >
+                        {option}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="flex border border-border/50 rounded-lg p-1 bg-card/50">
+                    <Button
+                      variant={viewMode === "grid" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setViewMode("grid")}
+                      className="p-2"
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === "list" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setViewMode("list")}
+                      className="p-2"
+                    >
+                      <List className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Featured Articles */}
+              {featuredArticles.length > 0 && (
+                <div className="mb-12">
+                  <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                    <Star className="w-6 h-6 text-yellow-500" />
+                    Featured & Trending
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {featuredArticles.slice(0, 4).map((article) => (
+                      <Link key={article.id} to={`/blog/${article.slug}`}>
+                        <Card className="group hover:shadow-glow transition-all duration-500 cursor-pointer border-border/50 hover:border-primary/30 relative overflow-hidden bg-card/80 backdrop-blur-sm h-full">
+                          {article.featured && (
+                            <div className="absolute top-4 left-4 z-10">
+                              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                ⭐ Editor's Pick
+                              </Badge>
+                            </div>
+                          )}
+                          {article.trending && (
+                            <div className="absolute top-4 right-4 z-10">
+                              <Badge className="bg-destructive/20 text-destructive border-destructive/30">
+                                🔥 Trending
+                              </Badge>
+                            </div>
+                          )}
+                          <CardHeader className="pb-4">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                                <img 
+                                  src={article.author.avatar} 
+                                  alt={article.author.name} 
+                                  className="w-full h-full rounded-full bg-card object-cover" 
+                                />
+                              </div>
+                              <div>
+                                <p className="font-medium text-foreground">{article.author.name}</p>
+                                <p className="text-sm text-muted-foreground">{article.category}</p>
+                              </div>
+                            </div>
+                            <h3 className="text-lg font-semibold group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                              {article.title}
+                            </h3>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-muted-foreground mb-4 line-clamp-2">{article.excerpt}</p>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              <Badge className={getSkillLevelColor(article.skillLevel)}>
+                                {article.skillLevel}
+                              </Badge>
+                              {article.tags.slice(0, 2).map((tag) => (
+                                <Badge key={tag} variant="outline" className="text-xs border-border/50">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                              <div className="flex items-center gap-4">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-4 h-4" />
+                                  {article.readTime}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Eye className="w-4 h-4" />
+                                  {article.views.toLocaleString()}
+                                </span>
+                              </div>
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Articles Grid/List */}
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold mb-6">All Articles</h2>
+                <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}>
+                  {currentArticles.map((article) => (
+                    <Link key={article.id} to={`/blog/${article.slug}`}>
+                      <Card className={`group hover:shadow-glow transition-all duration-300 cursor-pointer border-border/50 hover:border-primary/30 bg-card/80 backdrop-blur-sm ${viewMode === "list" ? "flex flex-row overflow-hidden h-40" : ""}`}>
+                        {viewMode === "list" ? (
+                          <>
+                            <div className="w-1/3 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                              <BookOpen className="w-12 h-12 text-primary/50" />
+                            </div>
+                            <div className="w-2/3 p-6 flex flex-col justify-between">
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                                    <img 
+                                      src={article.author.avatar} 
+                                      alt={article.author.name} 
+                                      className="w-full h-full rounded-full bg-card object-cover" 
+                                    />
+                                  </div>
+                                  <span className="text-sm text-muted-foreground">{article.author.name}</span>
+                                  <span className="text-xs text-muted-foreground">•</span>
+                                  <span className="text-xs text-muted-foreground">{article.category}</span>
+                                </div>
+                                <h3 className="text-lg font-semibold group-hover:text-primary transition-colors mb-2 line-clamp-1">
+                                  {article.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{article.excerpt}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <Badge className={getSkillLevelColor(article.skillLevel)}>
+                                    {article.skillLevel}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">{article.readTime}</span>
+                                </div>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary p-0.5">
+                                  <img 
+                                    src={article.author.avatar} 
+                                    alt={article.author.name} 
+                                    className="w-full h-full rounded-full bg-card object-cover" 
+                                  />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-foreground">{article.author.name}</p>
+                                  <p className="text-sm text-muted-foreground">{article.category}</p>
+                                </div>
+                              </div>
+                              <h3 className="text-lg font-semibold group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                                {article.title}
+                              </h3>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-muted-foreground mb-4 line-clamp-3">{article.excerpt}</p>
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                <Badge className={getSkillLevelColor(article.skillLevel)}>
+                                  {article.skillLevel}
+                                </Badge>
+                                {article.tags.slice(0, 2).map((tag) => (
+                                  <Badge key={tag} variant="outline" className="text-xs border-border/50">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                <div className="flex items-center gap-4">
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-4 h-4" />
+                                    {article.readTime}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Eye className="w-4 h-4" />
+                                    {article.views.toLocaleString()}
+                                  </span>
+                                </div>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </div>
+                            </CardContent>
+                          </>
+                        )}
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Enhanced Pagination */}
+              {totalPages > 1 && (
+                <Pagination className="justify-center">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {/* First page */}
+                    {currentPage > 3 && (
+                      <>
+                        <PaginationItem>
+                          <PaginationLink 
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(1);
+                            }}
+                            isActive={currentPage === 1}
+                          >
+                            1
+                          </PaginationLink>
+                        </PaginationItem>
+                        {currentPage > 4 && (
+                          <PaginationItem>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        )}
+                      </>
+                    )}
+
+                    {/* Pages around current */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => page >= Math.max(1, currentPage - 2) && page <= Math.min(totalPages, currentPage + 2))
+                      .map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink 
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(page);
+                            }}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+
+                    {/* Last page */}
+                    {currentPage < totalPages - 2 && (
+                      <>
+                        {currentPage < totalPages - 3 && (
+                          <PaginationItem>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        )}
+                        <PaginationItem>
+                          <PaginationLink 
+                            href="#" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(totalPages);
+                            }}
+                            isActive={currentPage === totalPages}
+                          >
+                            {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      </>
+                    )}
+
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                        }}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Community Engagement Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-secondary/5">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-4">Want to share your knowledge with the cybersecurity community?</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of cybersecurity professionals sharing insights and learning together.
+      {/* Enhanced CTA Section */}
+      <section className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5" />
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <h2 className="text-4xl font-bold mb-6">Join the Cybersecurity Community</h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Share your expertise, learn from others, and help build a safer digital world together.
           </p>
-          <Button size="lg" className="bg-gradient-cyber text-white hover:opacity-90 mb-6">
-            <PenTool className="w-5 h-5 mr-2" />
-            ✍️ Start Writing
-          </Button>
-          <p className="text-muted-foreground">
-            <strong>1,200+</strong> articles shared by cybersecurity enthusiasts
-          </p>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+            <Button size="lg" className="bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:shadow-glow transition-all duration-300 px-8">
+              <PenTool className="w-5 h-5 mr-2" />
+              Write an Article
+            </Button>
+            <Button size="lg" variant="outline" className="border-primary/50 hover:border-primary">
+              <User className="w-5 h-5 mr-2" />
+              Join Community
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary mb-2">1,200+</div>
+              <div className="text-muted-foreground">Articles Published</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-secondary mb-2">50K+</div>
+              <div className="text-muted-foreground">Monthly Readers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-accent mb-2">500+</div>
+              <div className="text-muted-foreground">Expert Authors</div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-16 px-4 border-t border-border/50">
+      <section className="py-16 px-4 border-t border-border/50 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-muted-foreground mb-6">
-            Get the latest cybersecurity articles and insights delivered to your inbox weekly.
+          <h2 className="text-3xl font-bold mb-4">Stay Ahead of Cyber Threats</h2>
+          <p className="text-muted-foreground mb-8">
+            Get weekly insights, breaking news, and expert analysis delivered to your inbox.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
             <Input
-              placeholder="Enter your email"
+              placeholder="Enter your email address"
               type="email"
-              className="flex-1"
+              className="flex-1 bg-background/50 border-border/50 focus:border-primary/50"
             />
-            <Button>Subscribe</Button>
+            <Button className="bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+              Subscribe
+            </Button>
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            No spam. Unsubscribe at any time.
+          <p className="text-sm text-muted-foreground">
+            Join 10,000+ cybersecurity professionals. No spam, unsubscribe anytime.
           </p>
         </div>
       </section>

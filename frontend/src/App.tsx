@@ -3,13 +3,14 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage';
-import Profile from './pages/profile';
+import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
 import CategoryDetail from './pages/CategoryDetail';
 import Categories from './pages/Categories';
 import Quiz from './pages/Quiz';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
+import WriteBlog from './pages/WriteBlog';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="/quiz/:slug" element={<Quiz />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/blog/write" element={<WriteBlog />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />

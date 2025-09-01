@@ -2,9 +2,17 @@
 import mongoose from "mongoose";
 
 const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },   // e.g., "Network Security"
-  slug: { type: String, required: true, unique: true },   // e.g., "network-security"
-  description: { type: String },
+  name: { type: String, required: true },
+  description: String,
+
+  subcategories: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Subcategory" }
+  ],
+
+  // Achievements specific to this category
+  achievements: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Achievement" }
+  ],
   createdAt: { type: Date, default: Date.now }
 });
 

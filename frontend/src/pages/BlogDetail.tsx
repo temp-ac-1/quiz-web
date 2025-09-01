@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { 
   Clock, User, Calendar, Share2, Twitter, Linkedin, 
   Copy, ThumbsUp, Heart, Lightbulb, MessageCircle,
-  ChevronUp, BookOpen, Shield, Lock, Network, Code
+  ChevronUp, BookOpen, Shield, Lock, Network, Code, Edit
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -278,7 +278,7 @@ const BlogDetail = () => {
     //   title: "Reaction added!",
     //   description: `Thanks for your ${type.slice(0, -1)}!`
     // });
-    toast("Reaction added!");
+    toast.success("Reaction added!");
   };
 
   const getSkillLevelColor = (level: string) => {
@@ -563,9 +563,12 @@ const BlogDetail = () => {
             Have insights, tutorials, or experiences to share with the community? 
             Start writing and help others learn cybersecurity.
           </p>
-          <Button size="lg" className="bg-gradient-cyber text-white hover:opacity-90">
-            ✍️ Write Your First Article
-          </Button>
+          <Link to="/blog/write">
+            <Button size="lg" className="bg-gradient-cyber text-white hover:opacity-90">
+              <Edit className="w-4 h-4 mr-2" />
+              Write Your First Article
+            </Button>
+          </Link>
         </section>
       </div>
 

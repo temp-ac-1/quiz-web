@@ -10,6 +10,16 @@ const userSchema = new mongoose.Schema({
   otp: { type: String },
   otpExpiry: { type: Date },
 
+
+  totalPoints: { type: Number, default: 0 },
+  // Track which achievements user has unlocked
+  achievements: [
+    {
+      achievement: { type: mongoose.Schema.Types.ObjectId, ref: "Achievement" },
+      earnedAt: { type: Date, default: Date.now }
+    }
+  ],
+
   // Roles & permissions
   role: { type: String, enum: ["user", "admin", "superadmin"], default: "user" },
 

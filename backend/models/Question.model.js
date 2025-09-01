@@ -33,6 +33,8 @@ const QuestionSchema = new mongoose.Schema({
   resources: [{ type: String }],       // optional links, images, etc.
   tags: [{ type: String }],            // e.g., ["encryption", "SQLi"]
 
+
+  points: { type: Number, default: 5 },
   createdAt: { type: Date, default: Date.now }
 });
 
