@@ -11,6 +11,9 @@ import Quiz from './pages/Quiz';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import WriteBlog from './pages/WriteBlog';
+import { Navigate } from "react-router-dom";
+import useAuth from "./hooks/useAuth";
+import OAuthSuccess from "./components/OAuthSuccess";
 
 function App() {
 
@@ -29,6 +32,7 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/signup" element={<AuthPage />} />
+          <Route path="/oauth-success" element={<OAuthSuccess />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/Blog" element={<div className="min-h-screen flex items-center justify-center"><h1>Blog Page - Coming Soon</h1></div>} />
           <Route path="/resources" element={<div className="min-h-screen flex items-center justify-center"><h1>Resources Page - Coming Soon</h1></div>} />

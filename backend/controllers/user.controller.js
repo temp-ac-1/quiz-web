@@ -19,8 +19,8 @@ const generateToken = (id) => {
     process.env.JWT_SECRET,
     {
       expiresIn: "1h",
-      issuer: "cybersec-website",
-      audience: "cybersec-users"
+      issuer: "cyberveer-website",
+      audience: "cyberveer-users"
     }
   );
 };

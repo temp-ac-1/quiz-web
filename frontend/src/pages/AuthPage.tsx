@@ -23,6 +23,7 @@ import {
   sanitizeOTP,
   preventClipboard 
 } from '../../src/lib/validation';
+import { Navigate } from 'react-router-dom';
 
 type SignUpStep = 'email' | 'otp' | 'details';
 
@@ -49,6 +50,7 @@ interface ValidationStatus {
 }
 
 const AuthPage: React.FC = () => {
+  const token = localStorage.getItem("authToken");
   const [isSignUp, setIsSignUp] = useState(false);
   const [signUpStep, setSignUpStep] = useState<SignUpStep>('email');
   const [showPassword, setShowPassword] = useState(false);
@@ -82,6 +84,10 @@ const AuthPage: React.FC = () => {
   /**
    * Toggle between Sign In and Sign Up forms
    */
+  if (token) {
+    return <Navigate to="/" />;
+  }
+
   const toggleAuthMode = useCallback(() => {
     setIsSignUp(prev => !prev);
     setSignUpStep('email');
@@ -347,7 +353,8 @@ const AuthPage: React.FC = () => {
    * Handle OAuth sign in (UI only)
    */
   const handleOAuthSignIn = useCallback((provider: 'google' | 'github') => {
-    toast.info(`${provider} OAuth integration coming soon!`);
+    const baseBackendUrl = "http://localhost:5000";
+    provider === 'google' ? window.location.href = `${baseBackendUrl}/auth/google` : window.location.href = `${baseBackendUrl}/auth/github`;
   }, []);
 
   /**

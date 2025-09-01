@@ -134,6 +134,12 @@ const Profile = () => {
     setActiveTab(tab);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.href = "/login"; // or use `navigate()`
+  };
+  
+
   return (
     <div className="min-h-screen w-full bg-white text-black p-0" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Navbar />
@@ -161,6 +167,9 @@ const Profile = () => {
                   <Button className="border border-black bg-black text-white font-bold py-2 px-6 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-900 hover:text-white flex items-center gap-2">
                     <Edit className="h-5 w-5 text-white" />
                     Edit Profile
+                  </Button>
+                  <Button className="border border-black bg-black text-white font-bold py-2 px-6 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-900 hover:text-white flex items-center gap-2" onClick={handleLogout}>
+                    Logout
                   </Button>
               </div>
             </div>
