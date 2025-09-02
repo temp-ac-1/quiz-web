@@ -1,56 +1,103 @@
 // routes/auth.route.js
 import express from "express";
 import passport from "passport";
-import { oauthSuccess } from "../controllers/auth.controller.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-// Google OAuth
+// Utility: Generate a JWT
+const generateToken = (userId) => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" } // token valid for 1 hour
+  );
+};
+
+// =================== GOOGLE AUTH ===================
+
+/**
+ * @route   GET /auth/google
+ * @desc    Start Google OAuth
+ */
 router.get(
   "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    prompt: "select_account",
-    accessType: "offline",
-    responseType: "code",
-    session: false,
-  })
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
+
+/**
+ * @route   GET /auth/google/callback
+ * @desc    Handle Google OAuth callback
+ */
 router.get(
   "/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "/login",
-  }),
+  passport.authenticate("google", { failureRedirect: "/login", session: false }),
   (req, res) => {
-    const { token } = req.user; // ✅ token from Google strategy
-    res.redirect(`${process.env.CLIENT_URL}/oauth-success?token=${token}`);
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=OAuthFailed`);
+    }
+
+    const token = generateToken(req.user.id);
+
+    // ✅ Set cookie instead of query string
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    // Redirect frontend without exposing token
+    res.redirect(`${process.env.CLIENT_URL}/oauth-success`);
   }
 );
 
-// GitHub OAuth
+// =================== GITHUB AUTH ===================
+
+/**
+ * @route   GET /auth/github
+ * @desc    Start GitHub OAuth
+ */
 router.get(
   "/github",
   passport.authenticate("github", { scope: ["user:email"] })
 );
+
+/**
+ * @route   GET /auth/github/callback
+ * @desc    Handle GitHub OAuth callback
+ */
 router.get(
   "/github/callback",
-  passport.authenticate("github", {
-    session: false,
-    failureRedirect: "/login",
-  }),
+  passport.authenticate("github", { failureRedirect: "/login", session: false }),
   (req, res) => {
-    const { token } = req.user;
-    res.redirect(`${process.env.CLIENT_URL}/oauth-success?token=${token}`);
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=OAuthFailed`);
+    }
+
+    const token = generateToken(req.user.id);
+
+    // ✅ Set cookie instead of query string
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    // Redirect frontend without exposing token
+    res.redirect(`${process.env.CLIENT_URL}/oauth-success`);
   }
 );
 
-router.get("/auth/logout", (req, res) => {
-  req.logout(() => {
-    req.session.destroy();
-    res.clearCookie("connect.sid"); // if using cookie-session
-    res.redirect(process.env.CLIENT_URL + "/login");
-  });
+// =================== LOGOUT ===================
+
+/**
+ * @route   POST /auth/logout
+ * @desc    Logout user
+ */
+router.post("/logout", (req, res) => {
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 });
 
 export default router;

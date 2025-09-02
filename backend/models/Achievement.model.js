@@ -1,5 +1,5 @@
 // models/Achievement.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const achievementSchema = new mongoose.Schema({
   title: { type: String, required: true },

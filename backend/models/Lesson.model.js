@@ -1,5 +1,5 @@
 // models/Lesson.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const lessonSchema = new mongoose.Schema({
   subcategoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Subcategory", required: true },

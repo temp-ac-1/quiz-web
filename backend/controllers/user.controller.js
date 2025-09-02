@@ -34,7 +34,7 @@ const generateToken = (id) => {
 
 
 // 📌 Register User
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -86,7 +86,7 @@ export const registerUser = async (req, res) => {
 };
 
 // 📌 Verify OTP
-export const verifyOtp = async (req, res) => {
+export const verifyOtp = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
 
@@ -110,28 +110,31 @@ export const verifyOtp = async (req, res) => {
 };
 
 // 📌 Login User
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "Invalid email or password" });
+    if (!user) return res.status(404).json({ message: "Invalid email or password" });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Invalid email or password" });
 
-    if (!user.isVerified) {
-      return res
-        .status(401)
-        .json({ message: "Please verify your email before login" });
-    }
+    if (!user.isVerified)
+      return res.status(401).json({ message: "Verify your email before login" });
 
     const token = generateToken(user._id);
-    res.json({ token, message: "Login successful" });
+
+    // ✅ Set token in HttpOnly cookie
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
+    res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
-    error.statusCode = 500;
     next(error);
   }
 };

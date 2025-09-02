@@ -37,7 +37,7 @@ const generateToken = (id) => {
           name: profile.displayName,
           isVerified: true, // social logins are usually auto-verified
           avatar: profile.photos[0]?.value || "",
-          password: "google_oauth_no_password", // or leave blank and prevent local login for this user
+          password: undefined, // or leave blank and prevent local login for this user
           provider: "google",
         });
       }
@@ -71,7 +71,7 @@ const generateToken = (id) => {
           name: profile.displayName || profile.username,
           isVerified: true,
           avatar: profile.photos?.[0]?.value || "",
-          password: "github_oauth_no_password",
+          password: undefined,
           provider: "github",
         });
       }

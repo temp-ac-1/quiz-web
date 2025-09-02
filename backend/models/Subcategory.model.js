@@ -1,5 +1,5 @@
 // models/Subcategory.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const subcategorySchema = new mongoose.Schema({
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },

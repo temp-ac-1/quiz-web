@@ -36,10 +36,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 
 const HomePage: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
+  const count = useAppSelector((state) => state.auth.value);
+  const dispatch = useAppDispatch();
   // Mouse tracking for parallax effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
