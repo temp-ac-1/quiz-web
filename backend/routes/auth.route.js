@@ -22,7 +22,7 @@ const generateToken = (userId) => {
  */
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  passport.authenticate("google", { scope: ["profile", "email"], prompt: 'select_account' })
 );
 
 /**
@@ -37,9 +37,8 @@ router.get(
       return res.redirect(`${process.env.CLIENT_URL}/login?error=OAuthFailed`);
     }
 
-    const token = generateToken(req.user.id);
+    const { user, token } = req.user;
 
-    // ✅ Set cookie instead of query string
     res.cookie("accessToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -47,7 +46,7 @@ router.get(
       maxAge: 60 * 60 * 1000,
     });
 
-    // Redirect frontend without exposing token
+    // ✅ Don't send user here, frontend will fetch it via /api/users/me
     res.redirect(`${process.env.CLIENT_URL}/oauth-success`);
   }
 );
@@ -75,9 +74,8 @@ router.get(
       return res.redirect(`${process.env.CLIENT_URL}/login?error=OAuthFailed`);
     }
 
-    const token = generateToken(req.user.id);
+    const { user, token } = req.user;
 
-    // ✅ Set cookie instead of query string
     res.cookie("accessToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -85,7 +83,7 @@ router.get(
       maxAge: 60 * 60 * 1000,
     });
 
-    // Redirect frontend without exposing token
+    // ✅ Same flow as Google
     res.redirect(`${process.env.CLIENT_URL}/oauth-success`);
   }
 );
@@ -97,7 +95,9 @@ router.get(
  * @desc    Logout user
  */
 router.post("/logout", (req, res) => {
+  res.clearCookie("accessToken");
   res.status(200).json({ success: true, message: "Logged out successfully" });
 });
+
 
 export default router;

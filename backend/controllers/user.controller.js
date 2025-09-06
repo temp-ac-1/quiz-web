@@ -1,8 +1,9 @@
+import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import User from "../models/User.model.js";
-
+dotenv.config();
 // Setup mail transport
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -36,39 +37,33 @@ const generateToken = (id) => {
 // 📌 Register User
 export const registerUser = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { userName, fullName, email, password } = req.body;
+    
+    const emailExist = await User.findOne({ email });
+    if (emailExist) return res.status(400).json({ message: "this email is already in use" });
 
-    const userExists = await User.findOne({ email });
-    if (userExists)
-      return res.status(400).json({ message: "User already exists" });
 
-    // Password Strength Validation
-    const isStrongPassword = (password) => {
-      const strongRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      return strongRegex.test(password);
-    };
-
-    if (!isStrongPassword(password)) {
-      return res.status(400).json({
-        message:
-          "Password must be at least 8 chars long, include uppercase, lowercase, number, and special character.",
-      });
+    const usernameExist = await User.findOne({ username: userName });
+    if (usernameExist) return res.status(400).json({ message: "this username is already taken" });
+    // validate password strength
+    const strongRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!strongRegex.test(password)) {
+      return res.status(400).json({ message: "Password not strong enough" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = Date.now() + 15 * 60 * 1000; // 15 mins
 
-    const user = await User.create({
-      email,
-      password: hashedPassword,
-      otp,
-      otpExpiry,
-    });
+    // create a short-lived token that carries signup info
+    const pendingToken = jwt.sign(
+      { userName, fullName, email, password: hashedPassword, otp },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
 
-    // Send OTP email
+    // send OTP via email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -76,65 +71,103 @@ export const registerUser = async (req, res, next) => {
       text: `Your OTP is ${otp}. It expires in 15 minutes.`,
     });
 
-    res
-      .status(201)
-      .json({ message: "User registered. Please verify your email with OTP." });
+    res.status(200).json({
+      message: "OTP sent to email. Verify to complete registration.",
+      pendingToken, // ⚠️ send to client (frontend must store it temporarily)
+    });
   } catch (error) {
-    error.statusCode = 500;
     next(error);
   }
 };
 
-// 📌 Verify OTP
+// 📌 Step 2: Verify OTP & Create Account
 export const verifyOtp = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
+    const { otp, pendingToken } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!pendingToken) return res.status(400).json({ message: "Missing pending token" });
 
-    if (user.otp !== otp || user.otpExpiry < Date.now()) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+    // verify pending token
+    let decoded;
+
+    try {
+      decoded = jwt.verify(pendingToken, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+    // check otp
+    if (decoded.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
-    await user.save();
+    // create user now
+    const user = await User.create({
+      username: decoded.userName,
+      fullname: decoded.fullName,
+      email: decoded.email,
+      password: decoded.password,
+      isVerified: true,
+      provider: "local",
+    });
 
-    res.json({ message: "Email verified successfully" });
+    res.status(201).json({ success: true, message: "Account created successfully", user });
   } catch (error) {
-    error.statusCode = 500;
     next(error);
   }
 };
+
 
 // 📌 Login User
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "Invalid email or password" });
+
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "Invalid email or password" });
+    }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect)
+    if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    if (!user.isVerified)
+    if (!user.isVerified) {
       return res.status(401).json({ message: "Verify your email before login" });
+    }
 
     const token = generateToken(user._id);
 
     // ✅ Set token in HttpOnly cookie
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production", // use HTTPS in prod
       sameSite: "Strict",
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    res.status(200).json({ success: true, message: "Login successful" });
+    // ✅ Send user object back (but remove password)
+    const { password: _, ...userWithoutPassword } = user.toObject();
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: userWithoutPassword,
+    });
   } catch (error) {
     next(error);
+  }
+};
+
+
+
+export const getMe = async (req, res) => {
+  try {
+    const userId = req.userId; // if using passport or JWT middleware
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    res.status(401).json({ message: 'Unauthorized' });
   }
 };

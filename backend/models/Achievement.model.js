@@ -9,4 +9,4 @@ const achievementSchema = new mongoose.Schema({
   badgeIcon: String // image url for badge
 });
 
-module.exports = mongoose.model("Achievement", achievementSchema);
+export default mongoose.model("Achievement", achievementSchema);

@@ -12,15 +12,18 @@ import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import "./config/passport.js";
+import cookieParser from "cookie-parser";
+import categoryRoutes from "./routes/category.route.js";
 
 dotenv.config();
 const app = express();
 
 app.use(express.json({ limit: "10kb" }));
-app.use(helmet());
-// sanitize request data
-app.use(mongoSanitize());
-app.use(xss());
+// app.use(helmet());
+// // sanitize request data
+// app.use(mongoSanitize());
+// app.use(xss());
+app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(
   session({
@@ -34,6 +37,7 @@ app.use(passport.session());
 
 app.use("/api/users", userRoutes);
 app.use("/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.use(errorHandler);
 

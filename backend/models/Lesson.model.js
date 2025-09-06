@@ -8,4 +8,4 @@ const lessonSchema = new mongoose.Schema({
   order: { type: Number, default: 0 }
 });
 
-module.exports = mongoose.model("Lesson", lessonSchema);
+export default mongoose.model("Lesson", lessonSchema);

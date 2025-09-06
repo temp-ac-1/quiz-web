@@ -18,4 +18,4 @@ const QuizSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Quiz", QuizSchema);
+export default mongoose.model("Quiz", QuizSchema);

@@ -10,4 +10,4 @@ const subcategorySchema = new mongoose.Schema({
   quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quiz" }]
 });
 
-module.exports = mongoose.model("Subcategory", subcategorySchema);
+export default mongoose.model("Subcategory", subcategorySchema);

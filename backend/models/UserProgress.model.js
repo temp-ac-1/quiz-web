@@ -1,5 +1,5 @@
 // models/UserProgress.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userProgressSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -13,9 +13,9 @@ const userProgressSchema = new mongoose.Schema({
   earnedPoints: { type: Number, default: 0 },
 
   // track which quiz questions user has already answered (so no duplicate points)
-  answeredQuestions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quiz" }],
+  answeredQuestions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }],
 
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("UserProgress", userProgressSchema);
+export default mongoose.model("UserProgress", userProgressSchema);

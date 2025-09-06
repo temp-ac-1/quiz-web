@@ -1,23 +1,21 @@
-// src/pages/OAuthSuccess.jsx
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { checkAuth } from "@/redux/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const OAuthSuccess = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
+    dispatch(checkAuth())
+      .unwrap()
+      .then(() => navigate("/")) // go to home
+      .catch(() => navigate("/auth")); // fallback
+  }, [dispatch, navigate]);
 
-    if (token) {
-      localStorage.setItem("authToken", token);
-      navigate("/"); // or wherever you want to go after login
-    } else {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  return <p>Redirecting...</p>;
+  return <div>Logging you in...</div>;
 };
 
 export default OAuthSuccess;

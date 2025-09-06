@@ -23,4 +23,4 @@ const UserQuizAttemptSchema = new mongoose.Schema({
   attemptedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("UserQuizAttempt", UserQuizAttemptSchema);
+export default mongoose.model("UserQuizAttempt", UserQuizAttemptSchema);

@@ -41,4 +41,4 @@ const QuestionSchema = new mongoose.Schema({
 // Compound index for fast queries
 QuestionSchema.index({ category: 1, type: 1, difficulty: 1 });
 
-module.exports = mongoose.model("Question", QuestionSchema);
+export default mongoose.model("Question", QuestionSchema);

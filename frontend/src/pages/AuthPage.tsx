@@ -1,400 +1,396 @@
-/**
- * Secure Authentication Page Component
- * Multi-step signup with email verification, username availability, and secure validation
- * Features: Real-time validation, OTP verification, username suggestions
- */
-
-import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Github, Mail, Lock, Shield, ArrowRight, User, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Checkbox } from '../components/ui/checkbox';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../components/ui/input-otp';
-import { toast } from 'sonner';
-import { 
-  validateEmail, 
-  validatePassword, 
-  validateOTP, 
-  sanitizeInput, 
+import React, { useState, useCallback, useEffect } from "react";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Eye,
+  EyeOff,
+  Github,
+  Mail,
+  Lock,
+  Shield,
+  ArrowRight,
+  User,
+  CheckCircle,
+  XCircle,
+  Clock,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Checkbox } from "../components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "../components/ui/input-otp";
+import { toast } from "sonner";
+import {
+  validateEmail,
+  validatePassword,
+  validateOTP,
+  sanitizeInput,
   sanitizePassword,
   sanitizeOTP,
-  preventClipboard 
-} from '../../src/lib/validation';
-import { Navigate } from 'react-router-dom';
+  preventClipboard,
+} from "../../src/lib/validation";
+import { Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { setUser, logout } from "@/redux/authSlice";
 
-type SignUpStep = 'email' | 'otp' | 'details';
-
+// Types
+type SignUpStep = "details" | "otp";
 interface FormData {
   email: string;
-  username: string;
+  userName: string;
+  fullName: string;
   password: string;
   otp: string;
   rememberMe: boolean;
 }
-
 interface FormErrors {
   email?: string;
-  username?: string;
+  userName?: string;
+  fullName?: string;
   password?: string;
   otp?: string;
 }
-
 interface ValidationStatus {
   email: boolean;
-  username: boolean;
+  userName: boolean;
+  fullName: boolean;
   password: boolean;
   otp: boolean;
 }
 
+// Axios instance
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+  withCredentials: true, // send/receive cookies
+});
+
 const AuthPage: React.FC = () => {
-  const token = localStorage.getItem("authToken");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [signUpStep, setSignUpStep] = useState<SignUpStep>('email');
+  const [signUpStep, setSignUpStep] = useState<SignUpStep>("details");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    username: '',
-    password: '',
-    otp: '',
-    rememberMe: false
-  });
+  const [pendingToken, setPendingToken] = useState<string>("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>({
     email: false,
-    username: false,
+    userName: false,
+    fullName: false,
     password: false,
-    otp: false
+    otp: false,
   });
-  const [usernameChecking, setUsernameChecking] = useState(false);
-  const [usernameSuggestions, setUsernameSuggestions] = useState<string[]>([]);
+  const [userNameChecking, setuserNameChecking] = useState(false);
+  const [userNameSuggestions, setuserNameSuggestions] = useState<string[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // OTP Timer Effect
+  const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    userName: "",
+    fullName: "",
+    password: "",
+    otp: "",
+    rememberMe: false,
+  });
+
+  // 🔹 Check session on mount
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await api.get("/api/users/me");
+        if (mounted && res.data?.user) {
+          dispatch(setUser(res.data.user));
+        }
+      } catch {
+        if (mounted) dispatch(logout());
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [dispatch]);
+
+  // 🔹 OTP Timer Effect
   useEffect(() => {
     if (otpTimer > 0) {
-      const timer = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
+      const timer = setTimeout(() => setOtpTimer((t) => t - 1), 1000);
       return () => clearTimeout(timer);
     }
   }, [otpTimer]);
 
-  /**
-   * Toggle between Sign In and Sign Up forms
-   */
-  if (token) {
+  if (isLoggedIn) {
     return <Navigate to="/" />;
   }
 
+  // 🔹 Toggle Sign In / Sign Up
   const toggleAuthMode = useCallback(() => {
-    setIsSignUp(prev => !prev);
-    setSignUpStep('email');
+    setIsSignUp((prev) => !prev);
+    setSignUpStep("details");
     setErrors({});
+    setPendingToken("");
     setFormData({
-      email: '',
-      username: '',
-      password: '',
-      otp: '',
-      rememberMe: false
+      email: "",
+      userName: "",
+      fullName: "",
+      password: "",
+      otp: "",
+      rememberMe: false,
     });
     setValidationStatus({
       email: false,
-      username: false,
+      userName: false,
+      fullName: false,
       password: false,
-      otp: false
+      otp: false,
     });
   }, []);
 
-  /**
-   * Check username availability (simulated)
-   */
-  const checkUsernameAvailability = useCallback(async (username: string): Promise<boolean> => {
-    if (!username || username.length < 3) return false;
-    
-    setUsernameChecking(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Simulate some usernames being taken
-    const takenUsernames = ['admin', 'user', 'test', 'demo', 'example'];
-    const isAvailable = !takenUsernames.includes(username.toLowerCase());
-    
-    if (!isAvailable) {
-      // Generate suggestions
-      const suggestions = [
-        `${username}123`,
-        `${username}_2024`,
-        `${username}_dev`,
-        `the_${username}`,
-        `${username}_official`
-      ];
-      setUsernameSuggestions(suggestions);
-    } else {
-      setUsernameSuggestions([]);
-    }
-    
-    setUsernameChecking(false);
+  // 🔹 Username Availability Check
+  const checkuserNameAvailability = useCallback(async (userName: string) => {
+    if (!userName || userName.length < 3) return false;
+    setuserNameChecking(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    const takenuserNames = ["admin", "user", "test", "demo", "example"];
+    const isAvailable = !takenuserNames.includes(userName.toLowerCase());
+    setuserNameSuggestions(
+      isAvailable
+        ? []
+        : [
+            `${userName}123`,
+            `${userName}_2025`,
+            `${userName}_dev`,
+            `the_${userName}`,
+            `${userName}_official`,
+          ]
+    );
+    setuserNameChecking(false);
     return isAvailable;
   }, []);
 
-  /**
-   * Handle input changes with real-time validation
-   */
-  const handleInputChange = useCallback((field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
+  // 🔹 Input Handlers
+  const handleInputChange = useCallback(
+    (field: keyof FormData, value: string | boolean) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Real-time validation
-    if (field === 'email' && typeof value === 'string') {
-      const { isValid } = validateEmail(value);
-      setValidationStatus(prev => ({ ...prev, email: isValid && value.length > 0 }));
-      if (value && !isValid) {
-        setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+      if (errors[field as keyof FormErrors]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
-    }
 
-    if (field === 'password' && typeof value === 'string') {
-      const { isValid } = validatePassword(value);
-      setValidationStatus(prev => ({ ...prev, password: isValid }));
-      if (value && !isValid) {
-        setErrors(prev => ({ 
-          ...prev, 
-          password: 'Password must contain uppercase, lowercase, number, and special character (min 8 chars)' 
+      if (field === "email" && typeof value === "string") {
+        const { isValid } = validateEmail(value);
+        setValidationStatus((prev) => ({
+          ...prev,
+          email: isValid && value.length > 0,
         }));
       }
-    }
 
-    if (field === 'username' && typeof value === 'string') {
-      if (value.length >= 3) {
-        checkUsernameAvailability(value).then(isAvailable => {
-          setValidationStatus(prev => ({ ...prev, username: isAvailable }));
-          if (!isAvailable) {
-            setErrors(prev => ({ ...prev, username: 'Username is not available' }));
-          }
-        });
-      } else {
-        setValidationStatus(prev => ({ ...prev, username: false }));
-        if (value.length > 0) {
-          setErrors(prev => ({ ...prev, username: 'Username must be at least 3 characters' }));
+      if (field === "password" && typeof value === "string") {
+        const { isValid } = validatePassword(value);
+        setValidationStatus((prev) => ({ ...prev, password: isValid }));
+      }
+
+      if (field === "userName" && typeof value === "string") {
+        if (value.length >= 3) {
+          checkuserNameAvailability(value).then((isAvailable) => {
+            setValidationStatus((prev) => ({ ...prev, userName: isAvailable }));
+          });
         }
       }
-    }
 
-    if (field === 'otp' && typeof value === 'string') {
-      const { isValid } = validateOTP(value);
-      setValidationStatus(prev => ({ ...prev, otp: isValid }));
-    }
-  }, [errors, checkUsernameAvailability]);
+      if (field === "fullName" && typeof value === "string") {
+        const ok = value.trim().length >= 2;
+        setValidationStatus((prev) => ({ ...prev, fullName: ok }));
+      }
 
-  /**
-   * Handle email input with sanitization
-   */
-  const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitized = sanitizeInput(e.target.value);
-    handleInputChange('email', sanitized);
-  }, [handleInputChange]);
+      if (field === "otp" && typeof value === "string") {
+        const { isValid } = validateOTP(value);
+        setValidationStatus((prev) => ({ ...prev, otp: isValid }));
+      }
+    },
+    [errors, checkuserNameAvailability]
+  );
 
-  /**
-   * Handle username input with sanitization
-   */
-  const handleUsernameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitized = sanitizeInput(e.target.value).toLowerCase().replace(/[^a-z0-9_]/g, '');
-    handleInputChange('username', sanitized);
-  }, [handleInputChange]);
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      handleInputChange("email", sanitizeInput(e.target.value)),
+    [handleInputChange]
+  );
 
-  /**
-   * Handle password input with sanitization
-   */
-  const handlePasswordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitized = sanitizePassword(e.target.value);
-    handleInputChange('password', sanitized);
-  }, [handleInputChange]);
+  const handleuserNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const sanitized = sanitizeInput(e.target.value)
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "");
+      handleInputChange("userName", sanitized);
+    },
+    [handleInputChange]
+  );
 
-  /**
-   * Handle OTP input with digit-only sanitization
-   */
-  const handleOTPChange = useCallback((value: string) => {
-    const sanitized = sanitizeOTP(value);
-    handleInputChange('otp', sanitized);
-  }, [handleInputChange]);
+  const handleFullNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      handleInputChange("fullName", sanitizeInput(e.target.value)),
+    [handleInputChange]
+  );
 
-  /**
-   * Send OTP (simulated)
-   */
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      handleInputChange("password", sanitizePassword(e.target.value)),
+    [handleInputChange]
+  );
+
+  const handleOTPChange = useCallback(
+    (value: string) => handleInputChange("otp", sanitizeOTP(value)),
+    [handleInputChange]
+  );
+
+  // 🔹 SIGN UP — Step 1
   const handleSendOTP = useCallback(async () => {
-    if (!validationStatus.email) {
-      toast.error('Please enter a valid email address');
+    if (
+      !validationStatus.userName ||
+      !validationStatus.fullName ||
+      !validationStatus.email ||
+      !validationStatus.password
+    ) {
+      toast.error("Please fill all fields correctly");
       return;
     }
-
     setIsLoading(true);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSignUpStep('otp');
-      setOtpTimer(60); // 60 second timer
-      toast.success('OTP sent to your email');
-    } catch (error) {
-      toast.error('Failed to send OTP. Please try again.');
+      const res = await api.post("/api/users/register", {
+        userName: formData.userName,
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
+      setPendingToken(res.data?.pendingToken);
+      setSignUpStep("otp");
+      setOtpTimer(60);
+      toast.success("OTP sent to your email");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to send OTP");
     } finally {
       setIsLoading(false);
     }
-  }, [validationStatus.email]);
+  }, [formData, validationStatus]);
 
-  /**
-   * Verify OTP (simulated)
-   */
+  // 🔹 SIGN UP — Step 2
   const handleVerifyOTP = useCallback(async () => {
     if (!validationStatus.otp) {
-      toast.error('Please enter a valid 6-digit OTP');
+      toast.error("Please enter a valid 6-digit OTP");
       return;
     }
-
+    if (!pendingToken) {
+      toast.error("Missing pending token, please restart signup");
+      setSignUpStep("details");
+      return;
+    }
     setIsLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate OTP verification (accept any 6-digit number except 000000)
-      if (formData.otp === '000000') {
-        setErrors({ otp: 'Invalid OTP. Please try again.' });
-        toast.error('Wrong OTP. Please try again.');
-        return;
-      }
-      
-      setSignUpStep('details');
-      toast.success('Email verified successfully!');
-    } catch (error) {
-      toast.error('OTP verification failed. Please try again.');
+      await api.post("/api/users/verify-otp", {
+        otp: formData.otp,
+        pendingToken,
+      });
+      toast.success("Account created successfully!");
+      setIsSignUp(false);
+      setSignUpStep("details");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
     }
-  }, [validationStatus.otp, formData.otp]);
+  }, [formData.otp, pendingToken, validationStatus.otp]);
 
-  /**
-   * Resend OTP
-   */
   const handleResendOTP = useCallback(async () => {
     await handleSendOTP();
   }, [handleSendOTP]);
 
-  /**
-   * Handle form submission
-   */
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isSignUp) {
-      if (signUpStep === 'email') {
-        await handleSendOTP();
-        return;
-      }
-      
-      if (signUpStep === 'otp') {
-        await handleVerifyOTP();
-        return;
-      }
-      
-      // Final signup step
-      if (!validationStatus.username || !validationStatus.password) {
-        toast.error('Please fill all required fields correctly');
-        return;
-      }
-    } else {
-      // Sign in validation
-      if (!validationStatus.email || !formData.password) {
-        toast.error('Please enter your email and password');
-        return;
-      }
+  // 🔹 SIGN IN
+  const handleSignIn = useCallback(async () => {
+    if (!validationStatus.email || !formData.password) {
+      toast.error("Please enter your email and password");
+      return;
     }
-
     setIsLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast.success(isSignUp ? 'Account created successfully!' : 'Signed in successfully!');
-      
-      // Reset form
-      setFormData({
-        email: '',
-        username: '',
-        password: '',
-        otp: '',
-        rememberMe: false
+      const res = await api.post("/api/users/login", {
+        email: formData.email,
+        password: formData.password,
       });
-      setErrors({});
-      setValidationStatus({
-        email: false,
-        username: false,
-        password: false,
-        otp: false
-      });
-      setSignUpStep('email');
-    } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      if (res.data?.user) {
+        dispatch(setUser(res.data.user));
+      }
+      toast.success("Signed in successfully!");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Sign in failed");
     } finally {
       setIsLoading(false);
     }
-  }, [isSignUp, signUpStep, validationStatus, formData.password, handleSendOTP, handleVerifyOTP]);
+  }, [formData.email, formData.password, validationStatus.email, dispatch]);
 
-  /**
-   * Handle OAuth sign in (UI only)
-   */
-  const handleOAuthSignIn = useCallback((provider: 'google' | 'github') => {
-    const baseBackendUrl = "http://localhost:5000";
-    provider === 'google' ? window.location.href = `${baseBackendUrl}/auth/google` : window.location.href = `${baseBackendUrl}/auth/github`;
+  // 🔹 Main submit handler
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (isSignUp) {
+        if (signUpStep === "details") return handleSendOTP();
+        if (signUpStep === "otp") return handleVerifyOTP();
+      } else {
+        return handleSignIn();
+      }
+    },
+    [isSignUp, signUpStep, handleSendOTP, handleVerifyOTP, handleSignIn]
+  );
+
+  // 🔹 OAuth
+  const handleOAuthSignIn = useCallback((provider: "google" | "github") => {
+    const baseBackendUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    window.location.href =
+      provider === "google"
+        ? `${baseBackendUrl}/auth/google`
+        : `${baseBackendUrl}/auth/github`;
   }, []);
 
-  /**
-   * Use username suggestion
-   */
-  const useSuggestion = useCallback((suggestion: string) => {
-    handleInputChange('username', suggestion);
-    setUsernameSuggestions([]);
-  }, [handleInputChange]);
+  const useSuggestion = useCallback(
+    (suggestion: string) => {
+      handleInputChange("userName", suggestion);
+      setuserNameSuggestions([]);
+    },
+    [handleInputChange]
+  );
 
+  // 🔹 UI
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background elements */}
+      {/* BG */}
       <div className="absolute inset-0 circuit-bg opacity-5"></div>
-      <motion.div 
+      <motion.div
         className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl"
-        animate={{ 
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360]
-        }}
-        transition={{ 
-          duration: 20, 
-          repeat: Infinity, 
-          ease: "linear" 
-        }}
+        animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"
-        animate={{ 
-          scale: [1.2, 1, 1.2],
-          rotate: [360, 180, 0]
-        }}
-        transition={{ 
-          duration: 25, 
-          repeat: Infinity, 
-          ease: "linear" 
-        }}
+        animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
       />
 
-      <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-primary/20 shadow-2xl relative">
+<Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-primary/20 shadow-2xl relative">
         <CardHeader className="text-center space-y-4">
           <motion.div
             initial={{ scale: 0 }}
@@ -412,17 +408,14 @@ const AuthPage: React.FC = () => {
               {isSignUp ? 'Create your secure account' : 'Sign in to your account'}
             </CardDescription>
           </div>
-
+  
           {/* Toggle Switch */}
           <div className="flex bg-muted/50 rounded-lg p-1 relative">
             <motion.div
               className="absolute top-1 bottom-1 bg-primary/20 border border-primary/50 rounded-md"
               layout
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                left: isSignUp ? '50%' : '4px',
-                right: isSignUp ? '4px' : '50%'
-              }}
+              style={{ left: isSignUp ? '50%' : '4px', right: isSignUp ? '4px' : '50%' }}
             />
             <button
               onClick={toggleAuthMode}
@@ -442,7 +435,7 @@ const AuthPage: React.FC = () => {
             </button>
           </div>
         </CardHeader>
-
+  
         <CardContent className="space-y-6">
           {/* OAuth Buttons */}
           <div className="space-y-3">
@@ -463,7 +456,7 @@ const AuthPage: React.FC = () => {
               Continue with GitHub
             </Button>
           </div>
-
+  
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-primary/20"></div>
@@ -472,7 +465,7 @@ const AuthPage: React.FC = () => {
               <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
             </div>
           </div>
-
+  
           {/* Main Form - Fixed Height Container */}
           <div className="min-h-[320px]">
             <AnimatePresence mode="wait">
@@ -518,7 +511,7 @@ const AuthPage: React.FC = () => {
                         <p className="text-sm text-destructive">{errors.email}</p>
                       )}
                     </div>
-
+  
                     {/* Password Field */}
                     <div className="space-y-2">
                       <Label htmlFor="password" className="text-sm font-medium">
@@ -546,7 +539,7 @@ const AuthPage: React.FC = () => {
                         </button>
                       </div>
                     </div>
-
+  
                     {/* Remember Me & Forgot Password */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
@@ -569,13 +562,87 @@ const AuthPage: React.FC = () => {
                     </div>
                   </>
                 )}
-
+  
                 {/* Sign Up Form */}
                 {isSignUp && (
                   <>
-                    {/* Email Step */}
-                    {signUpStep === 'email' && (
+                    {/* DETAILS STEP */}
+                    {signUpStep === 'details' && (
                       <div className="space-y-4">
+                        {/* userName */}
+                        <div className="space-y-2">
+                          <Label htmlFor="userName" className="text-sm font-medium">
+                            userName
+                          </Label>
+                          <div className="relative">
+                            <Input
+                              id="userName"
+                              type="text"
+                              value={formData.userName}
+                              onChange={handleuserNameChange}
+                              placeholder="Choose username"
+                              className="input-cyber pr-10 pl-10"
+                              autoComplete="off"
+                              required
+                            />
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            {formData.userName && (
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                {userNameChecking ? (
+                                  <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                                ) : validationStatus.userName ? (
+                                  <CheckCircle className="w-4 h-4 text-green-500" />
+                                ) : (
+                                  <XCircle className="w-4 h-4 text-red-500" />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {errors.userName && (
+                            <p className="text-sm text-destructive">{errors.userName}</p>
+                          )}
+  
+                          {/* Suggestions */}
+                          {userNameSuggestions.length > 0 && (
+                            <div className="space-y-2">
+                              <p className="text-xs text-muted-foreground">Suggestions:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {userNameSuggestions.map((s, i) => (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => useSuggestion(s)}
+                                    className="px-2 py-1 text-xs bg-primary/10 text-primary rounded border border-primary/20 hover:bg-primary/20 transition-colors"
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+  
+                        {/* Full Name */}
+                        <div className="space-y-2">
+                          <Label htmlFor="fullName" className="text-sm font-medium">
+                            Full Name
+                          </Label>
+                          <Input
+                            id="fullName"
+                            type="text"
+                            value={formData.fullName}
+                            onChange={handleFullNameChange}
+                            placeholder="Your full name"
+                            className="input-cyber"
+                            autoComplete="off"
+                            required
+                          />
+                          {errors.fullName && (
+                            <p className="text-sm text-destructive">{errors.fullName}</p>
+                          )}
+                        </div>
+  
+                        {/* Email */}
                         <div className="space-y-2">
                           <Label htmlFor="signup-email" className="text-sm font-medium">
                             Email Address
@@ -605,128 +672,8 @@ const AuthPage: React.FC = () => {
                             <p className="text-sm text-destructive">{errors.email}</p>
                           )}
                         </div>
-                        <div className="text-center text-sm text-muted-foreground">
-                          We'll send a verification code to your email
-                        </div>
-                      </div>
-                    )}
-
-                    {/* OTP Step */}
-                    {signUpStep === 'otp' && (
-                      <div className="space-y-4">
-                        <div className="text-center">
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Enter the 6-digit code sent to <br />
-                            <span className="font-medium text-foreground">{formData.email}</span>
-                          </p>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium text-center block">
-                            Verification Code
-                          </Label>
-                          <div className="flex justify-center">
-                            <InputOTP
-                              maxLength={6}
-                              value={formData.otp}
-                              onChange={handleOTPChange}
-                              onPaste={preventClipboard}
-                              onCopy={preventClipboard}
-                            >
-                              <InputOTPGroup>
-                                {[...Array(6)].map((_, i) => (
-                                  <InputOTPSlot 
-                                    key={i} 
-                                    index={i} 
-                                    className="input-cyber w-10 h-12" 
-                                  />
-                                ))}
-                              </InputOTPGroup>
-                            </InputOTP>
-                          </div>
-                          {errors.otp && (
-                            <p className="text-sm text-destructive text-center">{errors.otp}</p>
-                          )}
-                        </div>
-
-                        {/* Resend OTP */}
-                        <div className="text-center">
-                          {otpTimer > 0 ? (
-                            <div className="flex items-center justify-center text-sm text-muted-foreground">
-                              <Clock className="w-4 h-4 mr-1" />
-                              Resend code in {otpTimer}s
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={handleResendOTP}
-                              className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center mx-auto"
-                            >
-                              <RefreshCw className="w-4 h-4 mr-1" />
-                              Resend Code
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Details Step */}
-                    {signUpStep === 'details' && (
-                      <div className="space-y-4">
-                        {/* Username Field */}
-                        <div className="space-y-2">
-                          <Label htmlFor="username" className="text-sm font-medium">
-                            Username
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              id="username"
-                              type="text"
-                              value={formData.username}
-                              onChange={handleUsernameChange}
-                              placeholder="Choose username"
-                              className="input-cyber pr-10 pl-10"
-                              autoComplete="off"
-                              required
-                            />
-                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            {formData.username && (
-                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                {usernameChecking ? (
-                                  <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-                                ) : validationStatus.username ? (
-                                  <CheckCircle className="w-4 h-4 text-green-500" />
-                                ) : (
-                                  <XCircle className="w-4 h-4 text-red-500" />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          {errors.username && (
-                            <p className="text-sm text-destructive">{errors.username}</p>
-                          )}
-                          
-                          {/* Username Suggestions */}
-                          {usernameSuggestions.length > 0 && (
-                            <div className="space-y-2">
-                              <p className="text-xs text-muted-foreground">Suggestions:</p>
-                              <div className="flex flex-wrap gap-2">
-                                {usernameSuggestions.map((suggestion, index) => (
-                                  <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => useSuggestion(suggestion)}
-                                    className="px-2 py-1 text-xs bg-primary/10 text-primary rounded border border-primary/20 hover:bg-primary/20 transition-colors"
-                                  >
-                                    {suggestion}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Password Field */}
+  
+                        {/* Password */}
                         <div className="space-y-2">
                           <Label htmlFor="signup-password" className="text-sm font-medium">
                             Password
@@ -767,15 +714,78 @@ const AuthPage: React.FC = () => {
                         </div>
                       </div>
                     )}
+  
+                    {/* OTP STEP */}
+                    {signUpStep === 'otp' && (
+                      <div className="space-y-4">
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Enter the 6-digit code sent to <br />
+                            <span className="font-medium text-foreground">{formData.email}</span>
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-center block">
+                            Verification Code
+                          </Label>
+                          <div className="flex justify-center">
+                            <InputOTP
+                              maxLength={6}
+                              value={formData.otp}
+                              onChange={handleOTPChange}
+                              onPaste={preventClipboard}
+                              onCopy={preventClipboard}
+                            >
+                              <InputOTPGroup>
+                                {[...Array(6)].map((_, i) => (
+                                  <InputOTPSlot 
+                                    key={i} 
+                                    index={i} 
+                                    className="input-cyber w-10 h-12" 
+                                  />
+                                ))}
+                              </InputOTPGroup>
+                            </InputOTP>
+                          </div>
+                          {errors.otp && (
+                            <p className="text-sm text-destructive text-center">{errors.otp}</p>
+                          )}
+                        </div>
+  
+                        {/* Resend OTP */}
+                        <div className="text-center">
+                          {otpTimer > 0 ? (
+                            <div className="flex items-center justify-center text-sm text-muted-foreground">
+                              <Clock className="w-4 h-4 mr-1" />
+                              Resend code in {otpTimer}s
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleResendOTP}
+                              className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center mx-auto"
+                            >
+                              <RefreshCw className="w-4 h-4 mr-1" />
+                              Resend Code
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
-
+  
                 {/* Submit Button */}
                 <div className="pt-4">
                   <Button
                     type="submit"
                     className="w-full btn-cyber group"
-                    disabled={isLoading || (isSignUp && signUpStep === 'email' && !validationStatus.email) || (isSignUp && signUpStep === 'otp' && !validationStatus.otp)}
+                    disabled={
+                      isLoading ||
+                      (isSignUp && signUpStep === 'details' && !(validationStatus.userName && validationStatus.fullName && validationStatus.email && validationStatus.password)) ||
+                      (isSignUp && signUpStep === 'otp' && !validationStatus.otp)
+                    }
                   >
                     {isLoading ? (
                       <div className="flex items-center">
@@ -786,11 +796,7 @@ const AuthPage: React.FC = () => {
                       <div className="flex items-center justify-center">
                         <Lock className="w-4 h-4 mr-2" />
                         {isSignUp 
-                          ? signUpStep === 'email' 
-                            ? 'Send OTP' 
-                            : signUpStep === 'otp' 
-                              ? 'Verify OTP' 
-                              : 'Create Account'
+                          ? (signUpStep === 'details' ? 'Send OTP' : 'Verify & Create Account')
                           : 'Sign In'
                         }
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -801,7 +807,7 @@ const AuthPage: React.FC = () => {
               </motion.form>
             </AnimatePresence>
           </div>
-
+  
           {/* Security Notice */}
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
